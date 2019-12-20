@@ -17,6 +17,8 @@ class Divisao:
 	# Construtor da divisão
 
 	def __init__(self):
+
+		self.id = ""
 		self.tipo = "generic"
 		self.camas = []
 		self.cadeiras = []
@@ -25,7 +27,12 @@ class Divisao:
 		self.pessoas = []
 		self.computadores = []
 		self.ocupado = False
+		self.viz = []
 
+	def equals(self, other):
+		if self.id is "":
+			return False
+		return self.id == other.id
 
 
 	# Adders para os arrays atributos
@@ -37,7 +44,7 @@ class Divisao:
 		self.cadeiras.append(nome)
 	
 	def adicionarMesa(self, nome):
-		self.cadeiras.append(nome)
+		self.mesas.append(nome)
 	
 	def adicionarLivro(self, nome):
 		self.livros.append(nome)
@@ -47,28 +54,34 @@ class Divisao:
 
 	def adicionarComputador(self, nome):
 		self.computadores.append(nome)
+	
+	def adicionarViz(self, nome):
+		self.viz.append(nome)
 
 
 
 	# Getters para nao ter de escrever sempre len(...)
 
-	def getCamas(self):
+	def getNumCamas(self):
 		return len(self.camas)
 	
-	def getCadeiras(self):
+	def getNumCadeiras(self):
 		return len(self.cadeiras)
 	
-	def getMesas(self):
+	def getNumMesas(self):
 		return len(self.mesas)
 
-	def getLivros(self):
+	def getNumLivros(self):
 		return len(self.livros)
 	
-	def getPessoas(self):
+	def getNumPessoas(self):
 		return len(self.pessoas)
 	
-	def getComputadores(self):
+	def getNumComputadores(self):
 		return len(self.computadores)
+
+	def getNumViz(self):
+		return len(self.viz)
 
 
 
@@ -84,14 +97,23 @@ class Divisao:
 	# Função para alterar o tipo de quarto consoante os seus conteudos
 	
 	def tipoQuarto(self):
-		if self.getCamas == 1:
+		if self.getNumCamas == 1:
 			self.tipo = "single"
-		elif self.getCamas == 2:
+		elif self.getNumCamas == 2:
 			self.tipo = "double"
-		elif self.getCadeiras >= 2 and self.getMesas == 1:
+		elif self.getNumCadeiras >= 2 and self.getNumMesas == 1:
 			self.tipo = "conference room"
 		else:
 			self.tipo = "generic"
+	
+	def suiteCheck(self, other):
+		if self.camas > 2:
+			if self.id in other.viz and other.id in self.viz:
+
+				return True
+		return False
+		
+	
 	
 	
 	# Função para adicionar objetos

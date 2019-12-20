@@ -8,9 +8,31 @@ from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 import Divisao
 
+# FUNÇÕES RELEVANTES À LISTA DE DIVISOES
+
+def id_divisoes(array_divisoes):
+	lista = []
+	for divisao in array_divisoes:
+		lista.append(divisao.id)
+	return lista
+
+def getDivisao(div_id, array_divisoes):
+	if div_id in id_divisoes(array_divisoes):
+		for elem in array_divisoes:
+			if elem.id is div_id:
+				return elem
+	
+
+
+
+
+# VARIÁVEIS CHAVE
+
 x_ant = 0
 y_ant = 0
 obj_ant = ''	
+room_ant = ''
+minimap = []
 
 # Fazer parse de doubles
 def fst(tuple):
@@ -69,10 +91,6 @@ def present_room(x, y):
 	
 	return "Porta"
 
-lista_divisoes
-
-
-
 # PERGUNTA 1
 
 def quartosOcupados(array_divisoes):
@@ -93,7 +111,7 @@ def quartosOcupados(array_divisoes):
 # PERGUNTA 2
 
 def suite_finder(array_divisoes):
-	# Implementar com os grafos
+	
 	pass
 
 # PERGUNTA 3
@@ -188,15 +206,35 @@ def probabilidade_mesa_sem_livros_com_uma_cadeira(array_divisoes):
 # ---------------------------------------------------------------
 # odometry callback
 def callback(data):
-	global x_ant, y_ant
+	
+	global x_ant, y_ant, room_ant, minimap
+
 	x=data.pose.pose.position.x-15
 	y=data.pose.pose.position.y-1.5
+
 	# show coordinates only when they change
+	
 	if x != x_ant or y != y_ant:
-		curr_space = present_room(x,y)
-		print (" x=%.1f y=%.1f : %s") % (x,y,curr_space)
+		curr_room = present_room(x,y)
+		print (" x=%.1f y=%.1f : %s") % (x,y,curr_room)
+		
+		if curr_room is not room_ant and curr_room not in id_divisoes(minimap):
+			newdivisao = Divisao.Divisao()
+			newdivisao.id = curr_room
+			minimap.append(newdivisao)
+		else:
+			divisao = getDivisao(curr_room, minimap)
+			divisao2 = getDivisao(room_ant, minimap)
+			if (divisao.suitecheck(divisao2)):
+				divisao.viz.append(room_ant)
+				divisao.tipo = "suite"
+			
+			
+	
 	x_ant = x
 	y_ant = y
+	if curr_room is not "Porta":
+		room_ant = curr_room
 
 # ---------------------------------------------------------------
 # object_recognition callback
@@ -211,6 +249,26 @@ def callback1(data):
 # questions_keyboard callback
 def callback2(data):
 	print ("question is %s") % data.data
+	question = data.data
+
+	if question is 1:
+		pass
+	elif question is 2:
+		pass
+	elif question is 3:
+		pass
+	elif question is 4:
+		pass
+	elif question is 5:
+		pass
+	elif question is 6:
+		pass
+	elif question is 7:
+		pass
+	elif question is 8:
+		pass
+	else:
+		print("Not recognizable")
 
 # ---------------------------------------------------------------
 def agent():
