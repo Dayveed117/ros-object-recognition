@@ -79,7 +79,7 @@ curr_room = ''
 room_ant = ''
 minimap = []
 
-# Fazer parse de doubles
+# Fazer parse de doubles, might not be needed
 def fst(tuple):
 	return tuple[0]
 
@@ -149,6 +149,8 @@ def present_room(x, y):
 		return (pm, "sala14")
 	
 	return ((0, 0), "porta")
+
+
 
 # PERGUNTA 1
 
@@ -253,21 +255,29 @@ def individual_mais_perto(array_divisoes):
 
 	# Calcular o caminho mais perto entre a posicao atual e cada elemento do array
 
-	path_distances = []
-	start = curr_room
+	div = getDivisao(curr_room, array_divisoes)
 
-	G = nx.Graph()
-	G = getEdges_weight(array_divisoes, G)
-	
-	for divisao in array_divisoes:
-		if divisao.tipo is 'single':
-			#dist é int 100% pois temos src e dest
-			dist = nx.shortest_path_length(G, start, divisao.id, weight='dist')
-			path_distances.append((divisao.id, dist))	
-	
-	path_distances.sort(key=snd, reverse=True)
+	if(div.tipo is not 'single'):
+		
+		path_distances = []
+		start = curr_room
 
-	print(f"O quarto mais perto é o %s a uma distancia de %.1f." %(fst(path_distances[0]), snd(path_distances[0])))
+		G = nx.Graph()
+		G = getEdges_weight(array_divisoes, G)
+
+		for divisao in array_divisoes:
+
+			if divisao.tipo is 'single':
+				#dist é int 100% pois temos src e dest
+				dist = nx.shortest_path_length(G, start, divisao.id, weight='dist')
+				path_distances.append((divisao.id, dist))	
+	
+		path_distances.sort(key=snd, reverse=True)
+		print(f"The closest single room is %s in a distance of %.1f." %(fst(path_distances[0]), snd(path_distances[0])))
+	
+	else:
+		print(f"The closest single room is %s, in which we are in" %curr_room)
+	
 	
 	
 	
@@ -287,7 +297,7 @@ def percurso_para_elevador(array_divisoes):
 	G = nx.Graph()
 	edge_list = getEdges(array_divisoes)
 	G.add_edges_from(edge_list)
-
+	
 	dest = 'corredor1'
 
 	if curr_room is 'corredor1':
