@@ -1,5 +1,6 @@
 import networkx as nx
 import Divisao
+from scipy.spatial import distance
 
 G = nx.Graph()
 
@@ -37,4 +38,14 @@ def getEdges(array_divisoes):
 			edges.append([divisao.id, vizinho])
 	return edges
 
-print(getEdges(a))
+def twopoint_distance(p1, p2):
+	x = (p1[0],p1[1])
+	y = (p2[0],p2[1])
+	dist = distance.euclidean(x,y)
+	return dist
+
+a = (1, 1)
+b = (0, 0)
+
+print(twopoint_distance(a,b))
+

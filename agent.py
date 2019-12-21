@@ -8,6 +8,7 @@ from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 import Divisao
 import networkx as nx
+from scipy.spatial import distance
 
 # FUNÇÕES RELEVANTES À LISTA DE DIVISOES E GRAFO
 
@@ -17,12 +18,19 @@ def id_divisoes(array_divisoes):
 		lista.append(divisao.id)
 	return lista
 
+def twopoint_distance(p1, p2):
+	x = (p1[0], p1[1])
+	y = (p2[0], p2[1])
+	dist = distance.euclidean(x,y)
+	return dist
+
 def getDivisao(div_id, array_divisoes):
 	if div_id in id_divisoes(array_divisoes):
 		for elem in array_divisoes:
 			if elem.id is div_id:
 				return elem
 
+# Sem distancias
 def getEdges(array_divisoes):
 	
 	edges = []
@@ -32,6 +40,19 @@ def getEdges(array_divisoes):
 		for vizinho in l_vizinhos:
 			edges.append([divisao.id, vizinho])
 	return edges 
+
+# Com distancias
+def getEdges_weight(array_divisoes):
+	
+	edges = []
+	
+	for divisao in array_divisoes:
+		l_vizinhos = divisao.viz
+		for vizinho in l_vizinhos:
+			dist = twopoint_distance(divisao.pm, vizinho.pm)
+			edges.append([divisao.id, vizinho], dist)
+	return edges 
+
 
 def pesquisa(grafo, src, dest, path):
 	
@@ -71,52 +92,63 @@ def present_room(x, y):
 	# Paredes Horizontais +-0.5
 	# Adicionar +- 0.1 consoante a orientação da parede para remover edge situations
 
-	if(15.2 <= x <= -14.8) and (-1.6 <= y <=-1.4):
-		return "elevador"
-
 	if(y < -1.3):
-		return "corredor1"
+		pm = (-6, -2.15)
+		return (pm, "corredor1")
 	
 	if((x > -11.9) and (5.3 <= y <= 7.4)):
-		return "corredor3"
+		pm = (-4.1, 6.35)
+		return (pm, "corredor3")
 
 	if((-11.9 <= x <= -9.4) and (-1.3 <= y <= 5.4)):
-		return "corredor2"
+		pm = (-10.7, 2.05)
+		return (pm, "corredor2")
 
 	if((-4.0 <= x <= -1.4) and (-1.3 <= y <= 5.4)):
-		return "corredor4"
+		pm = (-2.7, 2.05)
+		return (pm, "corredor4")
 
 	if((x <= -12.3) and (-0.9 <= y <= 2.4)):
-		return "sala5"
+		pm = (-14.0, 0.8)
+		return (pm, "sala5")
 
 	if((x <= -12.3) and (2.9 <= y <= 7.4)):
-		return "sala6"
+		pm = (-14.0, 2.2)
+		return (pm, "sala6")
 
 	if((x <= -11.0) and (y >= 7.8)):
-		return "sala7"
+		pm = (-13.35, -9.5)
+		return (pm,"sala7")
 
 	if((-10.5 <= x <= -6.1) and (y >= 7.8)):
-		return "sala8"
+		pm = (-8.3, 9.5)
+		return (pm, "sala8")
 
 	if((-5.7 <= x <= -1.1) and (y >= 7.8)):
-		return "sala9"
+		pm = (-3.4, 9.5)
+		return (pm, "sala9")
 
 	if((x >= -0.6) and (y >= 7.8)):
-		return "sala10"
+		pm = (-2.1, 9.5)
+		return (pm, "sala10")
 	
 	if((x >= -0.9) and (2.2 <= y <= 4.9)):
-		return "sala11"
+		pm = (1.35, 3.6)
+		return (pm, "sala11")
 
 	if((x >= -0.9) and (-1.0 <= y <= 1.7)):
-		return "sala12"
+		pm = (1.35, 0.4)
+		return (pm, "sala12")
 
 	if((-9.0 <= x <= -7.1) and (-1.0 <= y <= 4.9)):
-		return "sala13"
+		pm = (-8.05, 2)
+		return (pm, "sala13")
 
 	if((-6.5 <= x <= -4.5) and (-1.0 <= y <= 4.9)):
-		return "sala14"
+		pm = (-5.55, 2)
+		return (pm, "sala14")
 	
-	return "porta"
+	return ((0, 0), "porta")
 
 # PERGUNTA 1
 
@@ -221,8 +253,9 @@ def predominancia_computadores(array_divisoes):
 def individual_mais_perto(array_divisoes):
 
 	G = nx.Graph()
-	edge_list = getEdges
-	G.add_edges_from(edge_list)
+	weighted_edgelist = getEdges_weight(array_divisoes)
+	edges = fst(weighted_edgelist)
+	dist = snd(weighted_edgelist)
 
 # PERGUNTA 6
 
@@ -277,7 +310,7 @@ def probabilidade_mesa_sem_livros_com_uma_cadeira(array_divisoes):
 def callback(data):
 	
 	global x_ant, y_ant, curr_room, room_ant, minimap
-	bad_rooms = (room_ant, "elevador", "porta")
+	bad_rooms = (room_ant, "porta")
 
 	x=data.pose.pose.position.x-15
 	y=data.pose.pose.position.y-1.5
@@ -285,16 +318,18 @@ def callback(data):
 	# show coordinates only when they change
 	
 	if x != x_ant or y != y_ant:
-		curr_room = present_room(x,y)
+		(ponto_medio, curr_room) = present_room(x,y)
 		print (" x=%.1f y=%.1f : %s") % (x,y,curr_room)
 		
 		if curr_room not in bad_rooms and curr_room not in id_divisoes(minimap):
 			
 			newdivisao = Divisao.Divisao()
 			newdivisao.id = curr_room
+			newdivisao.pm = ponto_medio
 
 			if curr_room.startswith("corredor"):
 				newdivisao.tipo = "corredor"
+
 			minimap.append(newdivisao)
 
 		else:
@@ -316,7 +351,7 @@ def callback(data):
 def callback1(data):
 
 	global obj_ant, curr_room, minimap
-	bad_rooms = ("porta", "elevador")
+	bad_rooms = ("porta")
 
 	obj = data.data
 	if obj != obj_ant and data.data != "":

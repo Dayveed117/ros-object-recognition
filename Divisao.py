@@ -1,6 +1,5 @@
-# Classe que corresponde às salas
-
-
+#!/usr/bin/env python
+# encoding: utf8
 
 # Parse de doubles
 
@@ -28,6 +27,7 @@ class Divisao:
 		self.computadores = []
 		self.ocupado = False
 		self.viz = []
+		self.pm = 0
 
 	def equals(self, other):
 		if self.id is "":
@@ -113,7 +113,6 @@ class Divisao:
 				return True
 		return False
 		
-	
 	
 	
 	# Função para adicionar objetos
