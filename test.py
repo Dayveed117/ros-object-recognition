@@ -1,6 +1,6 @@
 import networkx as nx
 import Divisao
-from scipy.spatial import distance
+import math
 
 G = nx.Graph()
 
@@ -39,20 +39,16 @@ def getEdges(array_divisoes):
 	return edges
 
 def twopoint_distance(p1, p2):
-	x = (p1[0],p1[1])
-	y = (p2[0],p2[1])
-	dist = distance.euclidean(x,y)
+	dist = math.sqrt((p2[0] - p1[0])**2 + (p2[1] - p1[1])**2)
 	return dist
 
 a = (1, 1)
 b = (0, 0)
-
+asdasd = "book_eqw_e_qwee"
+ad = asdasd.split("_", 1)
 print(twopoint_distance(a,b))
+print(ad[0])
 
-d = [(("a","b"), "1"), (("a","b"), "2"), (("a","b"), "3")]
-
-sas = 1.3123
-print(f"%.1f" %sas)
 
 
 

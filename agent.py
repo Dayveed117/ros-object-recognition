@@ -8,20 +8,22 @@ from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 import Divisao
 import networkx as nx
-from scipy.spatial import distance
+import math
 
 # FUNÇÕES RELEVANTES À LISTA DE DIVISOES E GRAFO
 
 def id_divisoes(array_divisoes):
 	lista = []
+
+	if array_divisoes is []:
+		return lista
+
 	for divisao in array_divisoes:
 		lista.append(divisao.id)
 	return lista
 
 def twopoint_distance(p1, p2):
-	x = (p1[0], p1[1])
-	y = (p2[0], p2[1])
-	dist = distance.euclidean(x,y)
+	dist = math.sqrt((p2[0] - p1[0])**2 + (p2[1] - p1[1])**2)
 	return dist
 
 def getDivisao(div_id, array_divisoes):
@@ -297,7 +299,7 @@ def percurso_para_elevador(array_divisoes):
 	G = nx.Graph()
 	edge_list = getEdges(array_divisoes)
 	G.add_edges_from(edge_list)
-	
+
 	dest = 'corredor1'
 
 	if curr_room is 'corredor1':
@@ -336,7 +338,8 @@ def probabilidade_mesa_sem_livros_com_uma_cadeira(array_divisoes):
 def callback(data):
 	
 	global x_ant, y_ant, curr_room, room_ant, minimap
-	bad_rooms = (room_ant, "porta")
+	
+	bad_rooms = (room_ant, "porta", '')
 
 	x=data.pose.pose.position.x-15
 	y=data.pose.pose.position.y-1.5
@@ -347,29 +350,42 @@ def callback(data):
 		(ponto_medio, curr_room) = present_room(x,y)
 		print (" x=%.1f y=%.1f : %s") % (x,y,curr_room)
 		
-		if curr_room not in bad_rooms and curr_room not in id_divisoes(minimap):
-			
-			newdivisao = Divisao.Divisao()
-			newdivisao.id = curr_room
-			newdivisao.pm = ponto_medio
+		if curr_room not in bad_rooms:
 
-			if curr_room.startswith("corredor"):
-				newdivisao.tipo = "corredor"
+			if curr_room not in id_divisoes(minimap):
+				
+				newdivisao = Divisao.Divisao()
+				newdivisao.id = curr_room
+				newdivisao.pm = ponto_medio
 
-			minimap.append(newdivisao)
+				if curr_room.startswith("corredor"):
+					newdivisao.tipo = "corredor"
 
-		else:
-			
-			divisao = getDivisao(curr_room, minimap)
-			divisao2 = getDivisao(room_ant, minimap)
-			
-			if (divisao.suitecheck(divisao2)):
-				divisao.viz.append(room_ant)
-				divisao.tipo = "suite"
+				minimap.append(newdivisao)
+
+
+			else:
+
+				divisao = getDivisao(curr_room, minimap)
+				divisao2 = getDivisao(room_ant, minimap)
+				
+				if (divisao.suiteCheck(divisao2)):
+					divisao.tipo = "suite"
+					divisao2.tipo = "suite"
 			
 	x_ant = x
 	y_ant = y
+
+	# Adicionar vizinhos quando se muda de room ant se for possivel
+
 	if curr_room not in bad_rooms:
+		if room_ant not in newdivisao.viz:
+			
+			pastdiv = getDivisao(room_ant, minimap)
+
+			pastdiv.adicionarViz(curr_room)
+			newdivisao.adicionarViz(room_ant)
+
 		room_ant = curr_room
 
 # ---------------------------------------------------------------

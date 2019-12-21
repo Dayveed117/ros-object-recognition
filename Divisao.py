@@ -4,11 +4,11 @@
 # Parse de doubles
 
 def tipo_obj(nome):
-	nome.split("_", maxsplit=1)
+	nome.split("_", 1)
 	return nome[0]
 
 def nome_obj(nome):
-	nome.split("_", maxsplit=1)
+	nome.split("_", 1)
 	return nome[1]
 
 class Divisao:
@@ -97,7 +97,10 @@ class Divisao:
 	# Função para alterar o tipo de quarto consoante os seus conteudos
 	
 	def tipoQuarto(self):
-		if self.getNumCamas == 1:
+
+		if self.tipo is "suite":
+			pass
+		elif self.getNumCamas == 1:
 			self.tipo = "single"
 		elif self.getNumCamas == 2:
 			self.tipo = "double"
@@ -109,7 +112,6 @@ class Divisao:
 	def suiteCheck(self, other):
 		if self.camas > 2:
 			if self.id in other.viz and other.id in self.viz:
-
 				return True
 		return False
 		
@@ -147,8 +149,8 @@ class Divisao:
 						self.adicionarComputador(designacao)
 
 		else:
-			tipo = tipo_obj(sing_nome)
-			designacao = nome_obj(sing_nome)
+			tipo = tipo_obj(nome)
+			designacao = nome_obj(nome)
 			
 			if tipo is "bed":
 				if designacao not in self.camas:
