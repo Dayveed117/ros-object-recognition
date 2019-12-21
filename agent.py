@@ -71,13 +71,13 @@ def present_room(x, y):
 	# Paredes Horizontais +-0.5
 	# Adicionar +- 0.1 consoante a orientação da parede para remover edge situations
 
-	if(x == -15.0 and y ==-1.5):
+	if(15.2 <= x <= -14.8) and (-1.6 <= y <=-1.4):
 		return "elevador"
 
 	if(y < -1.3):
 		return "corredor1"
 	
-	if((x > -11.9) and (5.4 <= y <= 7.4)):
+	if((x > -11.9) and (5.3 <= y <= 7.4)):
 		return "corredor3"
 
 	if((-11.9 <= x <= -9.4) and (-1.3 <= y <= 5.4)):
@@ -146,7 +146,7 @@ def suite_finder(array_divisoes):
 			contSuite += 1
 
 	if contSuite == 0:
-		print(f"I have found %d suite rooms so far." %(contSuite/2))
+		print(f"I have found %d suite rooms so far.") %(contSuite/2)
 	else:
 		print("I haven't found any suites so far.")
 	
@@ -173,9 +173,9 @@ def searchPeople(array_divisoes):
 	diff = abs(pessoasCorredores - pessoasQuartos)
 
 	if pessoasCorredores > pessoasQuartos:
-		print(f"More people in hallways compared to rooms, about %d." %diff)
+		print(f"More people in hallways compared to rooms, about %d.") %(diff)
 	elif pessoasCorredores < pessoasQuartos:
-		print(f"More people in the rooms compared to hallways, about %d." %diff)
+		print(f"More people in the rooms compared to hallways, about %d.") %(diff)
 	else:
 		return "There are exactly the same number of people outside and inside rooms."
 
@@ -213,7 +213,7 @@ def predominancia_computadores(array_divisoes):
 
 	predominancia = values_stored[0][0]
 
-	print(f"To find computers, our best chance is in %s." %predominancia)
+	print(f"To find computers, our best chance is in %s.") %(predominancia)
 
 
 # PERGUNTA 5
@@ -223,8 +223,6 @@ def individual_mais_perto(array_divisoes):
 	G = nx.Graph()
 	edge_list = getEdges
 	G.add_edges_from(edge_list)
-
-	pass
 
 # PERGUNTA 6
 
@@ -245,10 +243,12 @@ def percurso_para_elevador(array_divisoes):
 
 	if curr_room is 'corredor1':
 		path = ['elevador']
+
 	elif curr_room is 'porta':
 		start = room_ant
 		path = pesquisa(start, dest, minimap, [])
 		path.append('elevador')
+
 	else:
 		start = curr_room
 		path = pesquisa(start, dest, minimap, [])
@@ -277,6 +277,7 @@ def probabilidade_mesa_sem_livros_com_uma_cadeira(array_divisoes):
 def callback(data):
 	
 	global x_ant, y_ant, curr_room, room_ant, minimap
+	bad_rooms = (room_ant, "elevador", "porta")
 
 	x=data.pose.pose.position.x-15
 	y=data.pose.pose.position.y-1.5
@@ -287,31 +288,42 @@ def callback(data):
 		curr_room = present_room(x,y)
 		print (" x=%.1f y=%.1f : %s") % (x,y,curr_room)
 		
-		if curr_room is not room_ant or curr_room is not "elevador" and curr_room not in id_divisoes(minimap):
+		if curr_room not in bad_rooms and curr_room not in id_divisoes(minimap):
+			
 			newdivisao = Divisao.Divisao()
 			newdivisao.id = curr_room
+
+			if curr_room.startswith("corredor"):
+				newdivisao.tipo = "corredor"
 			minimap.append(newdivisao)
+
 		else:
+			
 			divisao = getDivisao(curr_room, minimap)
 			divisao2 = getDivisao(room_ant, minimap)
+			
 			if (divisao.suitecheck(divisao2)):
 				divisao.viz.append(room_ant)
 				divisao.tipo = "suite"
 			
-			
-	
 	x_ant = x
 	y_ant = y
-	if curr_room is not "porta" or curr_room is not "elevador":
+	if curr_room not in bad_rooms:
 		room_ant = curr_room
 
 # ---------------------------------------------------------------
 # object_recognition callback
 def callback1(data):
-	global obj_ant
+
+	global obj_ant, curr_room, minimap
+	bad_rooms = ("porta", "elevador")
+
 	obj = data.data
 	if obj != obj_ant and data.data != "":
 		print ("object is %s") %data.data
+		if curr_room not in bad_rooms:
+			divisao = getDivisao(curr_room, minimap)
+			divisao.addobj(obj)
 	obj_ant = obj
 		
 # ---------------------------------------------------------------
@@ -341,8 +353,6 @@ def callback2(data):
 		pass
 	elif question is '8':
 		pass
-	else:
-		print("Not recognizable")
 
 # ---------------------------------------------------------------
 def agent():
