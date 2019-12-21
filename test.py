@@ -49,3 +49,9 @@ b = (0, 0)
 
 print(twopoint_distance(a,b))
 
+d = [(("a","b"), "1"), (("a","b"), "2"), (("a","b"), "3")]
+
+sas = 1.3123
+print(f"%.1f" %sas)
+
+

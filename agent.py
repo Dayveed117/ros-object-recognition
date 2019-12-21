@@ -38,20 +38,20 @@ def getEdges(array_divisoes):
 	for divisao in array_divisoes:
 		l_vizinhos = divisao.viz
 		for vizinho in l_vizinhos:
+			# Grafo sem peso
 			edges.append([divisao.id, vizinho])
 	return edges 
 
 # Com distancias
-def getEdges_weight(array_divisoes):
-	
-	edges = []
+def getEdges_weight(array_divisoes, grafo):
 	
 	for divisao in array_divisoes:
 		l_vizinhos = divisao.viz
 		for vizinho in l_vizinhos:
 			dist = twopoint_distance(divisao.pm, vizinho.pm)
-			edges.append([divisao.id, vizinho], dist)
-	return edges 
+			# Grafo com peso
+			grafo.add_edges_from([(divisao.id, vizinho)], dist=dist)
+	return grafo
 
 
 def pesquisa(grafo, src, dest, path):
@@ -118,7 +118,7 @@ def present_room(x, y):
 
 	if((x <= -11.0) and (y >= 7.8)):
 		pm = (-13.35, -9.5)
-		return (pm,"sala7")
+		return (pm, "sala7")
 
 	if((-10.5 <= x <= -6.1) and (y >= 7.8)):
 		pm = (-8.3, 9.5)
@@ -177,7 +177,7 @@ def suite_finder(array_divisoes):
 		if divisao.tipo is "suite":
 			contSuite += 1
 
-	if contSuite == 0:
+	if contSuite is not 0:
 		print(f"I have found %d suite rooms so far.") %(contSuite/2)
 	else:
 		print("I haven't found any suites so far.")
@@ -247,15 +247,31 @@ def predominancia_computadores(array_divisoes):
 
 	print(f"To find computers, our best chance is in %s.") %(predominancia)
 
-
 # PERGUNTA 5
 
 def individual_mais_perto(array_divisoes):
 
+	# Calcular o caminho mais perto entre a posicao atual e cada elemento do array
+
+	path_distances = []
+	start = curr_room
+
 	G = nx.Graph()
-	weighted_edgelist = getEdges_weight(array_divisoes)
-	edges = fst(weighted_edgelist)
-	dist = snd(weighted_edgelist)
+	G = getEdges_weight(array_divisoes, G)
+	
+	for divisao in array_divisoes:
+		if divisao.tipo is 'single':
+			#dist é int 100% pois temos src e dest
+			dist = nx.shortest_path_length(G, start, divisao.id, weight='dist')
+			path_distances.append((divisao.id, dist))	
+	
+	path_distances.sort(key=snd, reverse=True)
+
+	print(f"O quarto mais perto é o %s a uma distancia de %.1f." %(fst(path_distances[0]), snd(path_distances[0])))
+	
+	
+	
+	
 
 # PERGUNTA 6
 
@@ -279,12 +295,12 @@ def percurso_para_elevador(array_divisoes):
 
 	elif curr_room is 'porta':
 		start = room_ant
-		path = pesquisa(start, dest, minimap, [])
+		path = pesquisa(G, start, dest, [])
 		path.append('elevador')
 
 	else:
 		start = curr_room
-		path = pesquisa(start, dest, minimap, [])
+		path = pesquisa(G, start, dest, [])
 		path.append('elevador')
 
 	path.reverse()
@@ -381,9 +397,11 @@ def callback2(data):
 		#predominancia_computadores(minimap)
 		pass
 	elif question is '5':
+		#individual_mais_perto(minimap)
 		pass
 	elif question is '6':
-		percurso_para_elevador(minimap)
+		#percurso_para_elevador(minimap)
+		pass
 	elif question is '7':
 		pass
 	elif question is '8':
