@@ -159,16 +159,14 @@ def present_room(x, y):
 def quartosOcupados(array_divisoes):
 
 	contOcupados = 0
-	bad_divisoes = ["corredor", "elevador"]
-
 
 	# Percorrer todas as divisoes, ver se está ou não ocupado
 
 	for divisao in array_divisoes:
-		if not divisao.ver_ocupado() and divisao.tipo not in bad_divisoes:
+		if not divisao.ver_ocupado() and divisao.tipo is not "corredor":
 			contOcupados += 1
 	
-	print(f"There are %d rooms occupied, as far as i know." %contOcupados)
+	print(f"For the %d rooms that i have seen, %d host no person." %(divisao.checkRooms(),contOcupados))
 
 	
 # PERGUNTA 2
@@ -201,10 +199,10 @@ def searchPeople(array_divisoes):
 
 	for divisao in array_divisoes:
 		if divisao.ver_ocupado:
-			if divisao.tipo is "corredor" or divisao.tipo is "elevador":
-				pessoasCorredores += divisao.getPessoas
+			if divisao.tipo is "corredor":
+				pessoasCorredores += divisao.getNumPessoas()
 			else:
-				pessoasQuartos += divisao.getPessoas
+				pessoasQuartos += divisao.getNumPessoas()
 
 	diff = abs(pessoasCorredores - pessoasQuartos)
 
@@ -213,7 +211,7 @@ def searchPeople(array_divisoes):
 	elif pessoasCorredores < pessoasQuartos:
 		print(f"More people in the rooms compared to hallways, about %d.") %(diff)
 	else:
-		return "There are exactly the same number of people outside and inside rooms."
+		print("There are exactly the same number of people outside and inside rooms.")
 
 # PERGUNTA 4
 
@@ -228,17 +226,17 @@ def predominancia_computadores(array_divisoes):
 
 	for divisao in array_divisoes:
 		if divisao.tipo is 'generic':
-			pcs_in_generic += divisao.getComputadores
+			pcs_in_generic += divisao.getNumComputadores()
 		elif divisao.tipo is 'single':
-			pcs_in_single += divisao.getComputadores
+			pcs_in_single += divisao.getNumComputadores()
 		elif divisao.tipo is 'double':
-			pcs_in_double += divisao.getComputadores
+			pcs_in_double += divisao.getNumComputadores()
 		elif divisao.tipo is 'suite':
-			pcs_in_suite += divisao.getComputadores
+			pcs_in_suite += divisao.getNumComputadores()
 		elif divisao.tipo is 'conferece room':
-			pcs_in_conference += divisao.getComputadores
+			pcs_in_conference += divisao.getNumComputadores()
 		elif divisao.tipo is 'corridor':
-			pcs_in_corridor += divisao.getComputadores
+			pcs_in_corridor += divisao.getNumComputadores()
 	
 	# Fazer lista com tuplos('tipo', nr_pcs)
 	# Inverter consoante nr_pcs para ficar com o valor mais alto na primeira posicao
@@ -247,9 +245,10 @@ def predominancia_computadores(array_divisoes):
 	values_stored = [('generic', pcs_in_generic), ('single', pcs_in_single), ('double', pcs_in_double), ('corridor', pcs_in_corridor), ('conference room', pcs_in_conference), ('suite', pcs_in_suite)]
 	values_stored.sort(key=snd, reverse=True)
 
-	predominancia = values_stored[0][0]
-
-	print(f"To find computers, our best chance is in %s.") %(predominancia)
+	if values_stored[0][1] is not 0:
+		print(f"To find computers, our best chance is in %s.") %(values_stored[0][0])
+	else:
+		print(f"I haven't found a single computer yet.")
 
 # PERGUNTA 5
 
@@ -330,7 +329,23 @@ def estimativa_de_encontrar_livros(array_divisoes):
 def probabilidade_mesa_sem_livros_com_uma_cadeira(array_divisoes):
 	pass
 
+# Pergunta 9
 
+def inventory(array_divisoes):
+
+	d = getDivisao(curr_room, array_divisoes)
+	
+	print(d.id)
+	print(d.tipo)
+	print(d.camas)
+	print(d.cadeiras)
+	print(d.mesas)
+	print(d.livros)
+	print(d.pessoas)
+	print(d.computadores)
+	print(d.ocupado)
+	print(d.viz)
+	print(d.pm)
 
 
 # ---------------------------------------------------------------
@@ -348,7 +363,7 @@ def callback(data):
 	
 	if x != x_ant or y != y_ant:
 		(ponto_medio, curr_room) = present_room(x,y)
-		print (" x=%.1f y=%.1f : %s") % (x,y,curr_room)
+		print (" x=%.1f y=%.1f : %s - %s") % (x,y,curr_room, room_ant)
 		
 		if curr_room not in bad_rooms:
 
@@ -364,7 +379,7 @@ def callback(data):
 				minimap.append(newdivisao)
 
 
-			else:
+		else:
 
 				divisao = getDivisao(curr_room, minimap)
 				divisao2 = getDivisao(room_ant, minimap)
@@ -378,14 +393,17 @@ def callback(data):
 
 	# Adicionar vizinhos quando se muda de room ant se for possivel
 
-	if curr_room not in bad_rooms:
-		if room_ant not in newdivisao.viz:
-			
-			pastdiv = getDivisao(room_ant, minimap)
+	if curr_room not in bad_rooms and room_ant is not '':
+		
+		thisdiv = getDivisao(curr_room, minimap)
+		pastdiv = getDivisao(room_ant, minimap)
 
+		if room_ant not in thisdiv.viz:
 			pastdiv.adicionarViz(curr_room)
-			newdivisao.adicionarViz(room_ant)
-
+		if curr_room not in pastdiv.viz:
+			thisdiv.adicionarViz(room_ant)
+	
+	if curr_room not in bad_rooms:
 		room_ant = curr_room
 
 # ---------------------------------------------------------------
@@ -393,12 +411,12 @@ def callback(data):
 def callback1(data):
 
 	global obj_ant, curr_room, minimap
-	bad_rooms = ("porta")
+	bad_rooms = ("porta", '')
 
 	obj = data.data
 	if obj != obj_ant and data.data != "":
 		print ("object is %s") %data.data
-		if curr_room not in bad_rooms:
+		if curr_room not in bad_rooms and curr_room in id_divisoes(minimap):
 			divisao = getDivisao(curr_room, minimap)
 			divisao.addobj(obj)
 	obj_ant = obj
@@ -432,6 +450,8 @@ def callback2(data):
 		pass
 	elif question is '8':
 		pass
+	elif question is '9':
+		inventory(minimap)
 
 # ---------------------------------------------------------------
 def agent():

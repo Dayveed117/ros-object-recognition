@@ -42,13 +42,27 @@ def twopoint_distance(p1, p2):
 	dist = math.sqrt((p2[0] - p1[0])**2 + (p2[1] - p1[1])**2)
 	return dist
 
-a = (1, 1)
-b = (0, 0)
-asdasd = "book_eqw_e_qwee"
-ad = asdasd.split("_", 1)
-print(twopoint_distance(a,b))
-print(ad[0])
+def snd(tuple):
+	return tuple[1]
+
+fk = "barkbarkdog"
+
+values_stored = [('generic', 3), ('single', 4), ('double', 1), ('corridor', 2), ('conference room', 3), ('suite', 7)]
+values_stored.sort(key=snd, reverse=True)
+
+predominancia = values_stored[0][0]
+
+print(predominancia)
+print(predominancia[0])
+print(predominancia[0][0])
+print(predominancia[0][1])
 
 
+"""
+if predominancia[0][1] is not 0:
+	print(f"To find computers, our best chance is in %s.") %(predominancia)
+else:
+	print(f"I haven't found a single computer yet.")
+"""
 
 

@@ -3,13 +3,10 @@
 
 # Parse de doubles
 
-def tipo_obj(nome):
-	nome.split("_", 1)
-	return nome[0]
-
-def nome_obj(nome):
-	nome.split("_", 1)
-	return nome[1]
+def name_parse(nome):
+	full = nome.split("_", 1)
+	return (full[0], full[1])
+	
 
 class Divisao:
 
@@ -84,11 +81,25 @@ class Divisao:
 		return len(self.viz)
 
 
+	# Separar corredores e salas
+
+	def checkHalls(self):
+		c = 0
+		if self.tipo is "corredor":
+			c += 1
+		return c
+
+	def checkRooms(self):
+		c = 0
+		if self.id.startswith("sala"):
+			c += 1
+		return c
+
 
 	# Ver se existe pelo menos uma pessoa na divisao
 
 	def ver_ocupado(self):
-		if self.pessoas > 0:
+		if self.getNumPessoas is not 0:
 			self.ocupado = True
 		else:
 			self.ocupado = False
@@ -123,11 +134,10 @@ class Divisao:
 	def addobj(self, nome):
 		
 		if ',' in nome:
-			nome.split(",")
-			for sing_nome in nome:
+			elem = nome.split(",")
+			for sing_nome in elem:
 				
-				tipo = tipo_obj(sing_nome)
-				designacao = nome_obj(sing_nome)
+				(tipo, designacao) = name_parse(sing_nome)
 
 				if tipo is "bed":
 					if designacao not in self.camas:
@@ -149,8 +159,8 @@ class Divisao:
 						self.adicionarComputador(designacao)
 
 		else:
-			tipo = tipo_obj(nome)
-			designacao = nome_obj(nome)
+
+			(tipo, designacao) = name_parse(nome)
 			
 			if tipo is "bed":
 				if designacao not in self.camas:
