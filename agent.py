@@ -7,8 +7,9 @@ import rospy
 from std_msgs.msg import String
 from nav_msgs.msg import Odometry
 import Divisao
+import networkx as nx
 
-# FUNÇÕES RELEVANTES À LISTA DE DIVISOES
+# FUNÇÕES RELEVANTES À LISTA DE DIVISOES E GRAFO
 
 def id_divisoes(array_divisoes):
 	lista = []
@@ -21,16 +22,39 @@ def getDivisao(div_id, array_divisoes):
 		for elem in array_divisoes:
 			if elem.id is div_id:
 				return elem
+
+def getEdges(array_divisoes):
 	
+	edges = []
+	
+	for divisao in array_divisoes:
+		l_vizinhos = divisao.viz
+		for vizinho in l_vizinhos:
+			edges.append([divisao.id, vizinho])
+	return edges 
 
+def pesquisa(grafo, src, dest, path):
+	
+	if src is dest:
+		path.append(src)
+		return path
+    
+	for ponto1, pontos in dict(nx.bfs_successors(grafo, src)).items():
+        # Procurar a divisao pretendida nível a nível
+            if dest in pontos:
+                # Assim que chegarmos ao destino,
+                # Armazenar informação e fazer o caminho inverso
+                path.append(dest)
+                return pesquisa(grafo, src, ponto1, path)
 
-
+	
 
 # VARIÁVEIS CHAVE
 
 x_ant = 0
 y_ant = 0
-obj_ant = ''	
+obj_ant = ''
+curr_room = ''	
 room_ant = ''
 minimap = []
 
@@ -47,49 +71,52 @@ def present_room(x, y):
 	# Paredes Horizontais +-0.5
 	# Adicionar +- 0.1 consoante a orientação da parede para remover edge situations
 
+	if(x == -15.0 and y ==-1.5):
+		return "elevador"
+
 	if(y < -1.3):
-		return "Corredor1"
+		return "corredor1"
 	
 	if((x > -11.9) and (5.4 <= y <= 7.4)):
-		return "Corredor3"
+		return "corredor3"
 
 	if((-11.9 <= x <= -9.4) and (-1.3 <= y <= 5.4)):
-		return "Corredor2"
+		return "corredor2"
 
 	if((-4.0 <= x <= -1.4) and (-1.3 <= y <= 5.4)):
-		return "Corredor4"
+		return "corredor4"
 
 	if((x <= -12.3) and (-0.9 <= y <= 2.4)):
-		return "Sala5"
+		return "sala5"
 
 	if((x <= -12.3) and (2.9 <= y <= 7.4)):
-		return "Sala6"
+		return "sala6"
 
 	if((x <= -11.0) and (y >= 7.8)):
-		return "Sala7"
+		return "sala7"
 
 	if((-10.5 <= x <= -6.1) and (y >= 7.8)):
-		return "Sala8"
+		return "sala8"
 
 	if((-5.7 <= x <= -1.1) and (y >= 7.8)):
-		return "Sala9"
+		return "sala9"
 
 	if((x >= -0.6) and (y >= 7.8)):
-		return "Sala10"
+		return "sala10"
 	
 	if((x >= -0.9) and (2.2 <= y <= 4.9)):
-		return "Sala11"
+		return "sala11"
 
 	if((x >= -0.9) and (-1.0 <= y <= 1.7)):
-		return "Sala12"
+		return "sala12"
 
 	if((-9.0 <= x <= -7.1) and (-1.0 <= y <= 4.9)):
-		return "Sala13"
+		return "sala13"
 
 	if((-6.5 <= x <= -4.5) and (-1.0 <= y <= 4.9)):
-		return "Sala14"
+		return "sala14"
 	
-	return "Porta"
+	return "porta"
 
 # PERGUNTA 1
 
@@ -105,14 +132,24 @@ def quartosOcupados(array_divisoes):
 		if not divisao.ver_ocupado() and divisao.tipo not in bad_divisoes:
 			contOcupados += 1
 	
-	print(f"There are %d rooms occupied." %contOcupados)
+	print(f"There are %d rooms occupied, as far as i know." %contOcupados)
 
 	
 # PERGUNTA 2
 
 def suite_finder(array_divisoes):
 	
-	pass
+	contSuite = 0
+
+	for divisao in array_divisoes:
+		if divisao.tipo is "suite":
+			contSuite += 1
+
+	if contSuite == 0:
+		print(f"I have found %d suite rooms so far." %(contSuite/2))
+	else:
+		print("I haven't found any suites so far.")
+	
 
 # PERGUNTA 3
 
@@ -136,9 +173,9 @@ def searchPeople(array_divisoes):
 	diff = abs(pessoasCorredores - pessoasQuartos)
 
 	if pessoasCorredores > pessoasQuartos:
-		print(f"More people in hallways compared to rooms, about %d" %diff)
+		print(f"More people in hallways compared to rooms, about %d." %diff)
 	elif pessoasCorredores < pessoasQuartos:
-		print(f"More people in the rooms compared to hallways." %diff)
+		print(f"More people in the rooms compared to hallways, about %d." %diff)
 	else:
 		return "There are exactly the same number of people outside and inside rooms."
 
@@ -176,19 +213,51 @@ def predominancia_computadores(array_divisoes):
 
 	predominancia = values_stored[0][0]
 
-	print(f"To find computers, our best chance is in %s" %predominancia)
+	print(f"To find computers, our best chance is in %s." %predominancia)
 
 
 # PERGUNTA 5
 
 def individual_mais_perto(array_divisoes):
+
+	G = nx.Graph()
+	edge_list = getEdges
+	G.add_edges_from(edge_list)
+
 	pass
 
 # PERGUNTA 6
 
 # Não necessáriamente o mais curto
 def percurso_para_elevador(array_divisoes):
-	pass
+	
+	# Sabemos 100% que o agente começa no elevador, e que a única maneira de ir para o elevador é por passar pelo corredor1
+	# get current position
+	# pesquisar de onde estamos até chegar ao elevador
+	# no final append de 'elevador'
+	# Devolver uma lista ordenada
+
+	G = nx.Graph()
+	edge_list = getEdges(array_divisoes)
+	G.add_edges_from(edge_list)
+
+	dest = 'corredor1'
+
+	if curr_room is 'corredor1':
+		path = ['elevador']
+	elif curr_room is 'porta':
+		start = room_ant
+		path = pesquisa(start, dest, minimap, [])
+		path.append('elevador')
+	else:
+		start = curr_room
+		path = pesquisa(start, dest, minimap, [])
+		path.append('elevador')
+
+	path.reverse()
+	print("Por ordem, o caminho é o respetivo:")
+	print(path)
+				
 
 # PERGUNTA 7
 
@@ -207,7 +276,7 @@ def probabilidade_mesa_sem_livros_com_uma_cadeira(array_divisoes):
 # odometry callback
 def callback(data):
 	
-	global x_ant, y_ant, room_ant, minimap
+	global x_ant, y_ant, curr_room, room_ant, minimap
 
 	x=data.pose.pose.position.x-15
 	y=data.pose.pose.position.y-1.5
@@ -218,7 +287,7 @@ def callback(data):
 		curr_room = present_room(x,y)
 		print (" x=%.1f y=%.1f : %s") % (x,y,curr_room)
 		
-		if curr_room is not room_ant and curr_room not in id_divisoes(minimap):
+		if curr_room is not room_ant or curr_room is not "elevador" and curr_room not in id_divisoes(minimap):
 			newdivisao = Divisao.Divisao()
 			newdivisao.id = curr_room
 			minimap.append(newdivisao)
@@ -233,7 +302,7 @@ def callback(data):
 	
 	x_ant = x
 	y_ant = y
-	if curr_room is not "Porta":
+	if curr_room is not "porta" or curr_room is not "elevador":
 		room_ant = curr_room
 
 # ---------------------------------------------------------------
@@ -242,30 +311,35 @@ def callback1(data):
 	global obj_ant
 	obj = data.data
 	if obj != obj_ant and data.data != "":
-		print ("object is %s") % data.data
+		print ("object is %s") %data.data
 	obj_ant = obj
 		
 # ---------------------------------------------------------------
 # questions_keyboard callback
 def callback2(data):
-	print ("question is %s") % data.data
+
+	print ("question is %s") %data.data
 	question = data.data
 
-	if question is 1:
+	if question is '1':
+		#quartosOcupados(minimap)
 		pass
-	elif question is 2:
+	elif question is '2':
+		#suite_finder(minimap)
 		pass
-	elif question is 3:
+	elif question is '3':
+		#searchPeople(minimap)
 		pass
-	elif question is 4:
+	elif question is '4':
+		#predominancia_computadores(minimap)
 		pass
-	elif question is 5:
+	elif question is '5':
 		pass
-	elif question is 6:
+	elif question is '6':
+		percurso_para_elevador(minimap)
+	elif question is '7':
 		pass
-	elif question is 7:
-		pass
-	elif question is 8:
+	elif question is '8':
 		pass
 	else:
 		print("Not recognizable")
