@@ -23,7 +23,7 @@ class Divisao:
 		self.pessoas = []
 		self.computadores = []
 		self.viz = []
-		self.pm = 0
+		self.pm = (0,0)
 
 	def equals(self, other):
 		if self.id == "":
@@ -101,11 +101,11 @@ class Divisao:
 
 		if self.tipo is "suite" or self.tipo == 'corredor':
 			pass
-		elif self.getNumCamas is 1:
+		elif self.getNumCamas() is 1:
 			self.tipo = "single"
-		elif self.getNumCamas is 2:
+		elif self.getNumCamas() is 2:
 			self.tipo = "double"
-		elif self.getNumCadeiras >= 2 and self.getNumMesas is 1:
+		elif self.getNumCadeiras() >= 2 and self.getNumMesas() is 1:
 			self.tipo = "conference room"
 		else:
 			self.tipo = "generic"
@@ -114,7 +114,7 @@ class Divisao:
 
 		if self.tipo == "corredor" or other.tipo == 'corredor':
 			return False
-		elif self.getNumCamas() + other.getNumCamas() > 2:
+		elif (self.getNumCamas() + other.getNumCamas()) >= 2:
 			if self.id in other.viz and other.id in self.viz:
 				return True
 			return False

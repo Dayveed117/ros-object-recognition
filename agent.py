@@ -58,10 +58,11 @@ def getEdges_weight(array_divisoes, grafo):
 	
 	for divisao in array_divisoes:
 		l_vizinhos = divisao.viz
-		for vizinho in l_vizinhos:
+		for id_vizinho in l_vizinhos:
+			vizinho = getDivisao(id_vizinho, array_divisoes)
 			dist = twopoint_distance(divisao.pm, vizinho.pm)
 			# Grafo com peso
-			grafo.add_edges_from([(divisao.id, vizinho)], dist=dist)
+			grafo.add_edges_from([(divisao.id, vizinho.id)], dist=dist)
 	return grafo
 
 
@@ -215,11 +216,11 @@ def searchPeople(array_divisoes):
 	diff = abs(pessoasCorredores - pessoasQuartos)
 
 	if pessoasCorredores > pessoasQuartos:
-		print(f"More people in hallways compared to rooms, about %d.") %(diff)
+		print(f"More people in hallways compared to rooms, about %d more.") %(diff)
 	elif pessoasCorredores < pessoasQuartos:
-		print(f"More people in the rooms compared to hallways, about %d.") %(diff)
+		print(f"More people in the rooms compared to hallways, about %d more.") %(diff)
 	else:
-		print("There are exactly the same number of people outside and inside rooms.")
+		print(f"There are exactly the same number of people outside and inside rooms (%d)." %pessoasQuartos)
 
 # PERGUNTA 4
 
@@ -250,7 +251,7 @@ def predominancia_computadores(array_divisoes):
 	# Inverter consoante nr_pcs para ficar com o valor mais alto na primeira posicao
 	# Retornar o tipo
 
-	values_stored = [('generic', pcs_in_generic), ('single', pcs_in_single), ('double', pcs_in_double), ('corridor', pcs_in_corridor), ('conference room', pcs_in_conference), ('suite', pcs_in_suite)]
+	values_stored = [('generics', pcs_in_generic), ('singles', pcs_in_single), ('doubles', pcs_in_double), ('corridors', pcs_in_corridor), ('conference rooms', pcs_in_conference), ('suites', pcs_in_suite)]
 	values_stored.sort(key=snd, reverse=True)
 
 	if values_stored[0][1] is not 0:
@@ -326,7 +327,7 @@ def percurso_para_elevador(array_divisoes):
 
 	path.reverse()
 	path.append('elevador')
-	print("Por ordem, o caminho é o respetivo:")
+	print("We can take the respective path:")
 	print(path)
 				
 
@@ -357,6 +358,7 @@ def inventory(array_divisoes):
 		print(d.computadores)
 		print(d.viz)
 		print(d.pm)
+		print(id_divisoes(array_divisoes))
 	else:
 		print("Doors are dumb.")
 
@@ -377,7 +379,7 @@ def callback(data):
 		print (" x=%.1f y=%.1f : %s <- %s") % (x,y,curr_room, room_ant)
 
 		# Adicionar objetos à minimapa
-		if curr_room not in id_divisoes(minimap):
+		if curr_room not in id_divisoes(minimap) and curr_room != 'porta':
 
 			newdivisao = Divisao.Divisao()
 			newdivisao.id = curr_room
