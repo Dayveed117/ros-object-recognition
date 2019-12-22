@@ -99,7 +99,7 @@ class Divisao:
 	
 	def tiparQuarto(self):
 
-		if self.tipo is "suite":
+		if self.tipo is "suite" or self.tipo == 'corredor':
 			pass
 		elif self.getNumCamas is 1:
 			self.tipo = "single"

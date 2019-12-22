@@ -207,11 +207,10 @@ def searchPeople(array_divisoes):
 	# Casos extremos ainda nao contabilizados
 
 	for divisao in array_divisoes:
-		if divisao.ver_ocupado:
-			if divisao.tipo == "corredor":
-				pessoasCorredores += divisao.getNumPessoas()
-			else:
-				pessoasQuartos += divisao.getNumPessoas()
+		if divisao.tipo == "corredor":
+			pessoasCorredores += divisao.getNumPessoas()
+		else:
+			pessoasQuartos += divisao.getNumPessoas()
 
 	diff = abs(pessoasCorredores - pessoasQuartos)
 
@@ -255,7 +254,7 @@ def predominancia_computadores(array_divisoes):
 	values_stored.sort(key=snd, reverse=True)
 
 	if values_stored[0][1] is not 0:
-		print(f"To find computers, our best chance is in %s.") %(values_stored[0][0])
+		print(f"To find computers, our best chance is in %s." %(values_stored[0][0]))
 	else:
 		print(f"I haven't found a single computer yet.")
 
@@ -284,7 +283,7 @@ def individual_mais_perto(array_divisoes):
 					path_distances.append((divisao.id, dist))	
 		
 			path_distances.sort(key=snd, reverse=True)
-			print(f"The closest single room is %s in a distance of %.1f." %(fst(path_distances[0]), snd(path_distances[0])))
+			print(f"The closest single room is %s in a distance of %.1f." %(path_distances[0][0], path_distances[0][1]))
 		
 		else:
 			print(f"The closest single room is %s, in which we are in" %curr_room)
@@ -315,7 +314,7 @@ def percurso_para_elevador(array_divisoes):
 	dest = 'corredor1'
 
 	if curr_room == 'corredor1':
-		path = ['elevador']
+		pass
 
 	elif curr_room == 'porta':
 		start = room_ant
