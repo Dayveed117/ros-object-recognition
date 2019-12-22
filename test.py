@@ -45,24 +45,13 @@ def twopoint_distance(p1, p2):
 def snd(tuple):
 	return tuple[1]
 
-fk = "barkbarkdog"
 
-values_stored = [('generic', 3), ('single', 4), ('double', 1), ('corridor', 2), ('conference room', 3), ('suite', 7)]
-values_stored.sort(key=snd, reverse=True)
+a = "bad"
+b = "bad"
 
-predominancia = values_stored[0][0]
+print(a is b)
 
-print(predominancia)
-print(predominancia[0])
-print(predominancia[0][0])
-print(predominancia[0][1])
-
-
-"""
-if predominancia[0][1] is not 0:
-	print(f"To find computers, our best chance is in %s.") %(predominancia)
-else:
-	print(f"I haven't found a single computer yet.")
-"""
+if a is "bad":
+	print("what")
 
 

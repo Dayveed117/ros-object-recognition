@@ -22,12 +22,11 @@ class Divisao:
 		self.livros = []
 		self.pessoas = []
 		self.computadores = []
-		self.ocupado = False
 		self.viz = []
 		self.pm = 0
 
 	def equals(self, other):
-		if self.id is "":
+		if self.id == "":
 			return False
 		return self.id == other.id
 
@@ -85,7 +84,7 @@ class Divisao:
 
 	def checkHalls(self):
 		c = 0
-		if self.tipo is "corredor":
+		if self.tipo == "corredor":
 			c += 1
 		return c
 
@@ -96,35 +95,30 @@ class Divisao:
 		return c
 
 
-	# Ver se existe pelo menos uma pessoa na divisao
-
-	def ver_ocupado(self):
-		if self.getNumPessoas is not 0:
-			self.ocupado = True
-		else:
-			self.ocupado = False
-
-
 	# Função para alterar o tipo de quarto consoante os seus conteudos
 	
-	def tipoQuarto(self):
+	def tiparQuarto(self):
 
 		if self.tipo is "suite":
 			pass
-		elif self.getNumCamas == 1:
+		elif self.getNumCamas is 1:
 			self.tipo = "single"
-		elif self.getNumCamas == 2:
+		elif self.getNumCamas is 2:
 			self.tipo = "double"
-		elif self.getNumCadeiras >= 2 and self.getNumMesas == 1:
+		elif self.getNumCadeiras >= 2 and self.getNumMesas is 1:
 			self.tipo = "conference room"
 		else:
 			self.tipo = "generic"
 	
 	def suiteCheck(self, other):
-		if self.camas > 2:
+
+		if self.tipo == "corredor" or other.tipo == 'corredor':
+			return False
+		elif self.getNumCamas() + other.getNumCamas() > 2:
 			if self.id in other.viz and other.id in self.viz:
 				return True
-		return False
+			return False
+		
 		
 	
 	
@@ -133,50 +127,54 @@ class Divisao:
 
 	def addobj(self, nome):
 		
-		if ',' in nome:
-			elem = nome.split(",")
+		# Algumas vezes acabam com ','
+		rm_shadytrail = nome.rstrip(',')
+
+		if ',' in rm_shadytrail:
+			
+			elem = rm_shadytrail.split(",")
 			for sing_nome in elem:
 				
 				(tipo, designacao) = name_parse(sing_nome)
 
-				if tipo is "bed":
+				if tipo == "bed":
 					if designacao not in self.camas:
 						self.adicionarCama(designacao)
-				elif tipo is "chair":
+				elif tipo == "chair":
 					if designacao not in self.cadeiras:
 						self.adicionarCadeira(designacao)
-				elif tipo is "table":
+				elif tipo == "table":
 					if designacao not in self.mesas:
 						self.adicionarMesa(designacao)
-				elif tipo is "book":
+				elif tipo == "book":
 					if designacao not in self.livros:
 						self.adicionarLivro(designacao)
-				elif tipo is "person":
+				elif tipo == "person":
 					if designacao not in self.pessoas:
 						self.adicionarPessoa(designacao)
-				elif tipo is "computer":
+				elif tipo == "computer":
 					if designacao not in self.computadores:
 						self.adicionarComputador(designacao)
 
 		else:
 
-			(tipo, designacao) = name_parse(nome)
+			(tipo, designacao) = name_parse(rm_shadytrail)
 			
-			if tipo is "bed":
+			if tipo == "bed":
 				if designacao not in self.camas:
 					self.adicionarCama(designacao)
-			elif tipo is "chair":
+			elif tipo == "chair":
 				if designacao not in self.cadeiras:
 					self.adicionarCadeira(designacao)
-			elif tipo is "table":
+			elif tipo == "table":
 				if designacao not in self.mesas:
 					self.adicionarMesa(designacao)
-			elif tipo is "book":
+			elif tipo == "book":
 				if designacao not in self.livros:
 					self.adicionarLivro(designacao)
-			elif tipo is "person":
+			elif tipo == "person":
 				if designacao not in self.pessoas:
 					self.adicionarPessoa(designacao)
-			elif tipo is "computer":
+			elif tipo == "computer":
 				if designacao not in self.computadores:
 					self.adicionarComputador(designacao)

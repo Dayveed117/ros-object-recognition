@@ -13,6 +13,7 @@ import math
 # FUNÇÕES RELEVANTES À LISTA DE DIVISOES E GRAFO
 
 def id_divisoes(array_divisoes):
+	
 	lista = []
 
 	if array_divisoes is []:
@@ -27,10 +28,18 @@ def twopoint_distance(p1, p2):
 	return dist
 
 def getDivisao(div_id, array_divisoes):
+	
 	if div_id in id_divisoes(array_divisoes):
 		for elem in array_divisoes:
-			if elem.id is div_id:
+			if elem.id == div_id:
 				return elem
+
+def singleCheck(array_divisoes):
+	
+	for divisao in array_divisoes:
+		if divisao.tipo == 'single':
+			return True
+	return False
 
 # Sem distancias
 def getEdges(array_divisoes):
@@ -78,7 +87,7 @@ x_ant = 0
 y_ant = 0
 obj_ant = ''
 curr_room = ''	
-room_ant = ''
+room_ant = 'corredor1'
 minimap = []
 
 # Fazer parse de doubles, might not be needed
@@ -156,17 +165,17 @@ def present_room(x, y):
 
 # PERGUNTA 1
 
-def quartosOcupados(array_divisoes):
+def quartosNaoOcupados(array_divisoes):
 
-	contOcupados = 0
+	naoOcupados = 0
 
 	# Percorrer todas as divisoes, ver se está ou não ocupado
 
 	for divisao in array_divisoes:
-		if not divisao.ver_ocupado() and divisao.tipo is not "corredor":
-			contOcupados += 1
+		if divisao.getNumPessoas() is 0 and divisao.tipo != "corredor":
+			naoOcupados += 1
 	
-	print(f"For the %d rooms that i have seen, %d host no person." %(divisao.checkRooms(),contOcupados))
+	print(f"I have seen %d rooms without people so far." %naoOcupados)
 
 	
 # PERGUNTA 2
@@ -176,7 +185,7 @@ def suite_finder(array_divisoes):
 	contSuite = 0
 
 	for divisao in array_divisoes:
-		if divisao.tipo is "suite":
+		if divisao.tipo == "suite":
 			contSuite += 1
 
 	if contSuite is not 0:
@@ -199,7 +208,7 @@ def searchPeople(array_divisoes):
 
 	for divisao in array_divisoes:
 		if divisao.ver_ocupado:
-			if divisao.tipo is "corredor":
+			if divisao.tipo == "corredor":
 				pessoasCorredores += divisao.getNumPessoas()
 			else:
 				pessoasQuartos += divisao.getNumPessoas()
@@ -225,17 +234,17 @@ def predominancia_computadores(array_divisoes):
 	pcs_in_suite = 0
 
 	for divisao in array_divisoes:
-		if divisao.tipo is 'generic':
+		if divisao.tipo == 'generic':
 			pcs_in_generic += divisao.getNumComputadores()
-		elif divisao.tipo is 'single':
+		elif divisao.tipo == 'single':
 			pcs_in_single += divisao.getNumComputadores()
-		elif divisao.tipo is 'double':
+		elif divisao.tipo == 'double':
 			pcs_in_double += divisao.getNumComputadores()
-		elif divisao.tipo is 'suite':
+		elif divisao.tipo == 'suite':
 			pcs_in_suite += divisao.getNumComputadores()
-		elif divisao.tipo is 'conferece room':
+		elif divisao.tipo == 'conferece room':
 			pcs_in_conference += divisao.getNumComputadores()
-		elif divisao.tipo is 'corridor':
+		elif divisao.tipo == 'corridor':
 			pcs_in_corridor += divisao.getNumComputadores()
 	
 	# Fazer lista com tuplos('tipo', nr_pcs)
@@ -256,28 +265,31 @@ def individual_mais_perto(array_divisoes):
 
 	# Calcular o caminho mais perto entre a posicao atual e cada elemento do array
 
-	div = getDivisao(curr_room, array_divisoes)
+	if singleCheck(array_divisoes):
+		div = getDivisao(curr_room, array_divisoes)
 
-	if(div.tipo is not 'single'):
+		if div.tipo != 'single':
 		
-		path_distances = []
-		start = curr_room
+			path_distances = []
+			start = curr_room
 
-		G = nx.Graph()
-		G = getEdges_weight(array_divisoes, G)
+			G = nx.Graph()
+			G = getEdges_weight(array_divisoes, G)
 
-		for divisao in array_divisoes:
+			for divisao in array_divisoes:
 
-			if divisao.tipo is 'single':
-				#dist é int 100% pois temos src e dest
-				dist = nx.shortest_path_length(G, start, divisao.id, weight='dist')
-				path_distances.append((divisao.id, dist))	
-	
-		path_distances.sort(key=snd, reverse=True)
-		print(f"The closest single room is %s in a distance of %.1f." %(fst(path_distances[0]), snd(path_distances[0])))
-	
+				if divisao.tipo == 'single':
+					#dist é int 100% pois temos src e dest
+					dist = nx.shortest_path_length(G, start, divisao.id, weight='dist')
+					path_distances.append((divisao.id, dist))	
+		
+			path_distances.sort(key=snd, reverse=True)
+			print(f"The closest single room is %s in a distance of %.1f." %(fst(path_distances[0]), snd(path_distances[0])))
+		
+		else:
+			print(f"The closest single room is %s, in which we are in" %curr_room)
 	else:
-		print(f"The closest single room is %s, in which we are in" %curr_room)
+		print("There are no single rooms as far as i know.")
 	
 	
 	
@@ -286,7 +298,7 @@ def individual_mais_perto(array_divisoes):
 
 # PERGUNTA 6
 
-# Não necessáriamente o mais curto
+# Não necessáriamente o mais curto, isto é bfs 
 def percurso_para_elevador(array_divisoes):
 	
 	# Sabemos 100% que o agente começa no elevador, e que a única maneira de ir para o elevador é por passar pelo corredor1
@@ -299,22 +311,22 @@ def percurso_para_elevador(array_divisoes):
 	edge_list = getEdges(array_divisoes)
 	G.add_edges_from(edge_list)
 
+	path = []
 	dest = 'corredor1'
 
-	if curr_room is 'corredor1':
+	if curr_room == 'corredor1':
 		path = ['elevador']
 
-	elif curr_room is 'porta':
+	elif curr_room == 'porta':
 		start = room_ant
 		path = pesquisa(G, start, dest, [])
-		path.append('elevador')
 
 	else:
 		start = curr_room
 		path = pesquisa(G, start, dest, [])
-		path.append('elevador')
 
 	path.reverse()
+	path.append('elevador')
 	print("Por ordem, o caminho é o respetivo:")
 	print(path)
 				
@@ -333,20 +345,21 @@ def probabilidade_mesa_sem_livros_com_uma_cadeira(array_divisoes):
 
 def inventory(array_divisoes):
 
-	d = getDivisao(curr_room, array_divisoes)
+	if curr_room != 'porta':
+		d = getDivisao(curr_room, array_divisoes)
 	
-	print(d.id)
-	print(d.tipo)
-	print(d.camas)
-	print(d.cadeiras)
-	print(d.mesas)
-	print(d.livros)
-	print(d.pessoas)
-	print(d.computadores)
-	print(d.ocupado)
-	print(d.viz)
-	print(d.pm)
-
+		print(d.id)
+		print(d.tipo)
+		print(d.camas)
+		print(d.cadeiras)
+		print(d.mesas)
+		print(d.livros)
+		print(d.pessoas)
+		print(d.computadores)
+		print(d.viz)
+		print(d.pm)
+	else:
+		print("Doors are dumb.")
 
 # ---------------------------------------------------------------
 # odometry callback
@@ -354,71 +367,67 @@ def callback(data):
 	
 	global x_ant, y_ant, curr_room, room_ant, minimap
 	
-	bad_rooms = (room_ant, "porta", '')
+	bad_rooms = (room_ant, 'porta')
 
 	x=data.pose.pose.position.x-15
 	y=data.pose.pose.position.y-1.5
 
 	# show coordinates only when they change
-	
 	if x != x_ant or y != y_ant:
 		(ponto_medio, curr_room) = present_room(x,y)
-		print (" x=%.1f y=%.1f : %s - %s") % (x,y,curr_room, room_ant)
-		
+		print (" x=%.1f y=%.1f : %s <- %s") % (x,y,curr_room, room_ant)
+
+		# Adicionar objetos à minimapa
+		if curr_room not in id_divisoes(minimap):
+
+			newdivisao = Divisao.Divisao()
+			newdivisao.id = curr_room
+			newdivisao.pm = ponto_medio
+
+			if curr_room.startswith('corredor'):
+				newdivisao.tipo = 'corredor'
+			
+			minimap.append(newdivisao)
+
+		# Lógica de adicionar vizinhos e suite check
 		if curr_room not in bad_rooms:
+			
+			thisdiv = getDivisao(curr_room, minimap)
+			pastdiv = getDivisao(room_ant, minimap)
 
-			if curr_room not in id_divisoes(minimap):
-				
-				newdivisao = Divisao.Divisao()
-				newdivisao.id = curr_room
-				newdivisao.pm = ponto_medio
+			if curr_room not in pastdiv.viz:
+				pastdiv.adicionarViz(curr_room)
+			if room_ant not in thisdiv.viz:
+				thisdiv.adicionarViz(room_ant)
+			
+			if thisdiv.suiteCheck(pastdiv):
+				thisdiv.tipo = 'suite'
+				pastdiv.tipo = 'suite'
 
-				if curr_room.startswith("corredor"):
-					newdivisao.tipo = "corredor"
-
-				minimap.append(newdivisao)
-
-
-		else:
-
-				divisao = getDivisao(curr_room, minimap)
-				divisao2 = getDivisao(room_ant, minimap)
-				
-				if (divisao.suiteCheck(divisao2)):
-					divisao.tipo = "suite"
-					divisao2.tipo = "suite"
+			room_ant = curr_room
 			
 	x_ant = x
 	y_ant = y
-
-	# Adicionar vizinhos quando se muda de room ant se for possivel
-
-	if curr_room not in bad_rooms and room_ant is not '':
-		
-		thisdiv = getDivisao(curr_room, minimap)
-		pastdiv = getDivisao(room_ant, minimap)
-
-		if room_ant not in thisdiv.viz:
-			pastdiv.adicionarViz(curr_room)
-		if curr_room not in pastdiv.viz:
-			thisdiv.adicionarViz(room_ant)
 	
-	if curr_room not in bad_rooms:
-		room_ant = curr_room
 
 # ---------------------------------------------------------------
 # object_recognition callback
 def callback1(data):
 
 	global obj_ant, curr_room, minimap
-	bad_rooms = ("porta", '')
+	bad_rooms = ("porta")
 
 	obj = data.data
 	if obj != obj_ant and data.data != "":
 		print ("object is %s") %data.data
-		if curr_room not in bad_rooms and curr_room in id_divisoes(minimap):
-			divisao = getDivisao(curr_room, minimap)
-			divisao.addobj(obj)
+		
+		# Lógica para adicionar objetos
+		if curr_room not in bad_rooms:
+			
+			thisdiv = getDivisao(curr_room, minimap)
+			thisdiv.addobj(obj)
+			thisdiv.tiparQuarto()
+
 	obj_ant = obj
 		
 # ---------------------------------------------------------------
@@ -428,29 +437,29 @@ def callback2(data):
 	print ("question is %s") %data.data
 	question = data.data
 
-	if question is '1':
-		#quartosOcupados(minimap)
+	if question == '1':
+		quartosNaoOcupados(minimap)
+		
+	elif question == '2':
+		suite_finder(minimap)
+		
+	elif question == '3':
+		searchPeople(minimap)
+		
+	elif question == '4':
+		predominancia_computadores(minimap)
+		
+	elif question == '5':
+		individual_mais_perto(minimap)
+		
+	elif question == '6':
+		percurso_para_elevador(minimap)
+
+	elif question == '7':
 		pass
-	elif question is '2':
-		#suite_finder(minimap)
+	elif question == '8':
 		pass
-	elif question is '3':
-		#searchPeople(minimap)
-		pass
-	elif question is '4':
-		#predominancia_computadores(minimap)
-		pass
-	elif question is '5':
-		#individual_mais_perto(minimap)
-		pass
-	elif question is '6':
-		#percurso_para_elevador(minimap)
-		pass
-	elif question is '7':
-		pass
-	elif question is '8':
-		pass
-	elif question is '9':
+	elif question == '9':
 		inventory(minimap)
 
 # ---------------------------------------------------------------
