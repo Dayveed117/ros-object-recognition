@@ -9,6 +9,7 @@ from nav_msgs.msg import Odometry
 import Divisao
 import networkx as nx
 import math
+import time
 
 # FUNÇÕES RELEVANTES À LISTA DE DIVISOES E GRAFO
 
@@ -84,6 +85,7 @@ def pesquisa(grafo, src, dest, path):
 
 # VARIÁVEIS CHAVE
 
+start_time = time.time()
 x_ant = 0
 y_ant = 0
 obj_ant = ''
@@ -334,12 +336,43 @@ def percurso_para_elevador(array_divisoes):
 # PERGUNTA 7
 
 def estimativa_de_encontrar_livros(array_divisoes):
-	pass
+	
+	contaLivros = 0	
+	
+	for divisao in array_divisoes:
+		contaLivros += divisao.getNumLivros()
+	
+	curr_time = time.time() - start_time	
+		
+	if curr_time is not 0:
+		estimativa = (contaLivros*120) / curr_time
+		print(f"I estimate finding about %d books in 2 minutes." %estimativa)
+	else:
+		print("I cant estimate with either no books or timer is 0.")
 
 # PERGUNTA 8
 					
 def probabilidade_mesa_sem_livros_com_uma_cadeira(array_divisoes):
-	pass
+	
+	# P(m and ~b | >1 chair)
+	# P(m and ~b)
+	# ------------
+	# P(>1 chair)
+
+	contA = 0
+	contB = 0
+
+	for divisao in array_divisoes:
+		if divisao.getNumLivros() is 0 and divisao.getNumMesas() >= 1:
+			contA += 1
+		if divisao.getNumCadeiras() >= 1:
+			contB += 1
+	
+	if contB is 0 or contA is 0:
+		print("My data says the chance is 0")
+	else:
+		prob = contA / contB
+		print(f"We have about %.2f chance of finding a table in those conditions as of now." %prob)
 
 # Pergunta 9
 
@@ -457,9 +490,11 @@ def callback2(data):
 		percurso_para_elevador(minimap)
 
 	elif question == '7':
-		pass
+		estimativa_de_encontrar_livros(minimap)
+		
 	elif question == '8':
-		pass
+		probabilidade_mesa_sem_livros_com_uma_cadeira(minimap)
+		
 	elif question == '9':
 		inventory(minimap)
 
