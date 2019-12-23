@@ -30,10 +30,9 @@ def twopoint_distance(p1, p2):
 
 def getDivisao(div_id, array_divisoes):
 	
-	if div_id in id_divisoes(array_divisoes):
-		for elem in array_divisoes:
-			if elem.id == div_id:
-				return elem
+	for elem in array_divisoes:
+		if elem.id == div_id:
+			return elem
 
 def singleCheck(array_divisoes):
 	
@@ -293,11 +292,6 @@ def individual_mais_perto(array_divisoes):
 	else:
 		print("There are no single rooms as far as i know.")
 	
-	
-	
-	
-	
-
 # PERGUNTA 6
 
 # Não necessáriamente o mais curto, isto é bfs 
@@ -345,7 +339,7 @@ def estimativa_de_encontrar_livros(array_divisoes):
 	curr_time = time.time() - start_time	
 		
 	if curr_time is not 0:
-		estimativa = (contaLivros*120) / curr_time
+		estimativa = (contaLivros*120.0) / curr_time
 		print(f"I estimate finding about %d books in 2 minutes." %estimativa)
 	else:
 		print("I cant estimate with either no books or timer is 0.")
@@ -353,7 +347,7 @@ def estimativa_de_encontrar_livros(array_divisoes):
 # PERGUNTA 8
 					
 def probabilidade_mesa_sem_livros_com_uma_cadeira(array_divisoes):
-	
+
 	# P(m and ~b | >1 chair)
 	# P(m and ~b)
 	# ------------
@@ -371,7 +365,7 @@ def probabilidade_mesa_sem_livros_com_uma_cadeira(array_divisoes):
 	if contB is 0 or contA is 0:
 		print("My data says the chance is 0")
 	else:
-		prob = contA / contB
+		prob = contA / float(contB)
 		print(f"We have about %.2f chance of finding a table in those conditions as of now." %prob)
 
 # Pergunta 9
@@ -433,7 +427,7 @@ def callback(data):
 				pastdiv.adicionarViz(curr_room)
 			if room_ant not in thisdiv.viz:
 				thisdiv.adicionarViz(room_ant)
-			
+
 			if thisdiv.suiteCheck(pastdiv):
 				thisdiv.tipo = 'suite'
 				pastdiv.tipo = 'suite'
@@ -457,7 +451,7 @@ def callback1(data):
 		
 		# Lógica para adicionar objetos
 		if curr_room not in bad_rooms:
-			
+
 			thisdiv = getDivisao(curr_room, minimap)
 			thisdiv.addobj(obj)
 			thisdiv.tiparQuarto()
@@ -494,7 +488,7 @@ def callback2(data):
 		
 	elif question == '8':
 		probabilidade_mesa_sem_livros_com_uma_cadeira(minimap)
-		
+
 	elif question == '9':
 		inventory(minimap)
 

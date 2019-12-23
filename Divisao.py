@@ -109,7 +109,7 @@ class Divisao:
 			self.tipo = "conference room"
 		else:
 			self.tipo = "generic"
-	
+
 	def suiteCheck(self, other):
 
 		if self.tipo == "corredor" or other.tipo == 'corredor':
@@ -118,14 +118,11 @@ class Divisao:
 			if self.id in other.viz and other.id in self.viz:
 				return True
 			return False
-		
-		
-	
 	
 	# Função para adicionar objetos
 	# Alguams vezes sao identificados mais do que um objeto de cada vez, daí precisarmos de poder separar por ',' primeiro
 
-	def addobj(self, nome):
+	def addobj(self, nome, viz):
 		
 		# Algumas vezes acabam com ','
 		rm_shadytrail = nome.rstrip(',')
@@ -138,7 +135,7 @@ class Divisao:
 				(tipo, designacao) = name_parse(sing_nome)
 
 				if tipo == "bed":
-					if designacao not in self.camas:
+					if designacao not in self.camas: 
 						self.adicionarCama(designacao)
 				elif tipo == "chair":
 					if designacao not in self.cadeiras:
