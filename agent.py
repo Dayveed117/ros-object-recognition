@@ -11,6 +11,21 @@ import networkx as nx
 import math
 import time
 
+
+# VARIÁVEIS CHAVE
+
+start_time = time.time()
+x = 0
+y = 0
+x_ant = 0
+y_ant = 0
+obj_ant = ''
+curr_room = ''	
+room_ant = 'corredor1'
+minimap = []
+
+
+
 # FUNÇÕES RELEVANTES À LISTA DE DIVISOES E GRAFO
 
 def id_divisoes(array_divisoes):
@@ -60,7 +75,10 @@ def getEdges_weight(array_divisoes, grafo):
 		l_vizinhos = divisao.viz
 		for id_vizinho in l_vizinhos:
 			vizinho = getDivisao(id_vizinho, array_divisoes)
-			dist = twopoint_distance(divisao.pm, vizinho.pm)
+			if divisao.id == curr_room:
+				dist = twopoint_distance((x,y), vizinho.pm)
+			else:
+				dist = twopoint_distance(divisao.pm, vizinho.pm)
 			# Grafo com peso
 			grafo.add_edges_from([(divisao.id, vizinho.id)], dist=dist)
 	return grafo
@@ -82,15 +100,6 @@ def pesquisa(grafo, src, dest, path):
 
 	
 
-# VARIÁVEIS CHAVE
-
-start_time = time.time()
-x_ant = 0
-y_ant = 0
-obj_ant = ''
-curr_room = ''	
-room_ant = 'corredor1'
-minimap = []
 
 # Fazer parse de doubles, might not be needed
 def fst(tuple):
@@ -357,10 +366,11 @@ def probabilidade_mesa_sem_livros_com_uma_cadeira(array_divisoes):
 	contB = 0
 
 	for divisao in array_divisoes:
-		if divisao.getNumLivros() is 0 and divisao.getNumMesas() >= 1:
-			contA += 1
 		if divisao.getNumCadeiras() >= 1:
 			contB += 1
+			if divisao.getNumLivros() is 0 and divisao.getNumMesas() >= 1:
+				contA += 1
+		
 	
 	if contB is 0 or contA is 0:
 		print("My data says the chance is 0")
@@ -393,7 +403,7 @@ def inventory(array_divisoes):
 # odometry callback
 def callback(data):
 	
-	global x_ant, y_ant, curr_room, room_ant, minimap
+	global x, y, x_ant, y_ant, curr_room, room_ant, minimap
 	
 	bad_rooms = (room_ant, 'porta')
 
