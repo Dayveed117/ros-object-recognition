@@ -41,17 +41,4 @@ def getEdges(array_divisoes):
 def twopoint_distance(p1, p2):
 	dist = math.sqrt((p2[0] - p1[0])**2 + (p2[1] - p1[1])**2)
 	return dist
-
-def snd(tuple):
-	return tuple[1]
-
-
-a = "bad"
-b = "bad"
-
-print(a is b)
-
-if a is "bad":
-	print("what")
-
-
+	

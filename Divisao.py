@@ -109,6 +109,7 @@ class Divisao:
 			self.tipo = "conference room"
 		else:
 			self.tipo = "generic"
+		
 
 	def suiteCheck(self, other):
 
