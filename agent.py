@@ -77,7 +77,7 @@ def searchPeople(array_divisoes):
 	if pessoasCorredores > pessoasQuartos:
 		print "More people in hallways compared to room."
 	elif pessoasCorredores < pessoasQuartos:
-		print "More people in the rooms compared to hallways"
+		print "More people in the rooms compared to hallways."
 	else:
 		print "There are exactly the same number of people inside and outside of rooms (%d)." %pessoasQuartos
 
@@ -105,7 +105,7 @@ def predominancia_computadores(array_divisoes):
 			pcs_in_double += divisao.getNumComputadores()
 		elif divisao.tipo == 'suite':
 			pcs_in_suite += divisao.getNumComputadores()
-		elif divisao.tipo == 'corridor':
+		elif divisao.tipo == 'corredor':
 			pcs_in_corridor += divisao.getNumComputadores()
 	
 	# Fazer lista com tuplos('tipo', nr_pcs)
@@ -152,7 +152,7 @@ def individual_mais_perto(array_divisoes):
 					print "%s: %.1f" %(divisao.id, dist)	
 		
 			path_distances.sort(key=snd)
-			print "The closest single room is %s in a distance of %.1f." %(path_distances[0][0], path_distances[0][1])
+			print "The closest single room is %s at a distance of about %.1f." %(path_distances[0][0], path_distances[0][1])
 		
 		else:
 			print "The closest single room is %s, in which we are in" %start
@@ -234,12 +234,11 @@ def probabilidade_mesa_sem_livros_com_uma_cadeira(array_divisoes):
 			if divisao.getNumLivros() is 0 and divisao.getNumMesas() >= 1:
 				contA += 1
 		
-	
 	if contB is 0 or contA is 0:
 		print("My data says the chance is 0")
 	else:
 		prob = contA / float(contB)
-		print "We have about %.2f chance of finding a table in those conditions as of now." %prob
+		print "We have about %.2f chance of finding a table under those conditions, as of now." %prob
 
 # Pergunta 9
 

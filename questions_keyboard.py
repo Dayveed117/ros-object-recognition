@@ -13,25 +13,25 @@ def questions():
 	r = rospy.Rate(10)
 	
 	# show questions
-	print (' ************************')
-	print ('    QUESTIONS ')
-	print (' ************************')
-	print ('  1-How many rooms are not occupied?')
-	print ('  2-How many suites did you find until now?')
-	print ('  3-Is it more probable to find people in the corridors or inside the rooms?')
-	print ('  4-If you want to find a computer, to which type of room do you go to?')
-	print ('  5-What is the number of the closest single room?')
-	print ('  6-How can you go from the current room to the elevator?')
-	print ('  7-How many books do you estimate to find in the next 2 minutes?')
-	print ('  8-What is the probability of finding a table in a room without books but that has at least one chair?')
-	print ('  9-Inventory')
+	print ' ************************'
+	print '    QUESTIONS '
+	print ' ************************'
+	print '  1-How many rooms are not occupied?'
+	print '  2-How many suites did you find until now?'
+	print '  3-Is it more probable to find people in the corridors or inside the rooms?'
+	print '  4-If you want to find a computer, to which type of room do you go to?'
+	print '  5-What is the number of the closest single room?'
+	print '  6-How can you go from the current room to the elevator?'
+	print '  7-How many books do you estimate to find in the next 2 minutes?'
+	print '  8-What is the probability of finding a table in a room without books but that has at least one chair?'
+	print '  9-Inventory'
  
 	tty.setcbreak(sys.stdin)
 
 	while not rospy.is_shutdown():
 		# read from keyboard
 		k=sys.stdin.read(1)
-		if int(k) < 1 or int(k) >8:
+		if int(k) < 1 or int(k) > 9:
 			continue
 		pub.publish(k)
 		#print ('Asked question: ' , k)

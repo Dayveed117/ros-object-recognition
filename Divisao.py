@@ -99,7 +99,7 @@ class Divisao:
 	
 	def tiparQuarto(self):
 
-		if self.tipo is "suite" or self.tipo == 'corredor':
+		if self.tipo == "suite" or self.tipo == 'corredor':
 			pass
 		elif self.getNumCamas() is 1:
 			self.tipo = "single"
@@ -118,7 +118,7 @@ class Divisao:
 		elif (self.getNumCamas() + other.getNumCamas()) >= 2:
 			if self.id in other.viz and other.id in self.viz:
 				return True
-			return False
+		return False
 	
 	# Função para adicionar objetos
 	# Alguams vezes sao identificados mais do que um objeto de cada vez, daí precisarmos de poder separar por ',' primeiro

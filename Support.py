@@ -45,8 +45,8 @@ def getEdges(array_divisoes):
 	for divisao in array_divisoes:
 		l_vizinhos = divisao.viz
 		for vizinho in l_vizinhos:
-			# Grafo sem peso
 			edges.append([divisao.id, vizinho])
+	# Retorna lista do estilo arestas sem peso
 	return edges 
 
 # Retorna um grafo cujas arestas são formadas consoante a divisão e coordenadas atuais
@@ -84,6 +84,7 @@ def pesquisa(grafo, src, dest, path):
                 return pesquisa(grafo, src, ponto1, path)
 
 
+# Função especializada a fazer parse para tipo book
 def bookP(nome):
 	full = nome.split("_", 1)
 	return (full[0], full[1])
