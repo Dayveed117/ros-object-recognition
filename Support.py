@@ -7,8 +7,9 @@ from math import sqrt
 
 # FUNÇÕES RELEVANTES À LISTA DE DIVISOES E GRAFO
 
+# Retorna uma lista dos IDs numa lista de divisões
 def id_divisoes(array_divisoes):
-	
+
 	lista = []
 
 	if array_divisoes is []:
@@ -18,24 +19,25 @@ def id_divisoes(array_divisoes):
 		lista.append(divisao.id)
 	return lista
 
+# Retorna a distância planar entre 2 pontos
 def twopoint_distance(p1, p2):
 	dist = sqrt((p2[0] - p1[0])**2 + (p2[1] - p1[1])**2)
 	return dist
 
+# Retorna uma instância de divisão consoante um ID numa lista de divisões
 def getDivisao(div_id, array_divisoes):
-	
 	for elem in array_divisoes:
 		if elem.id == div_id:
 			return elem
 
+# Verificação da existencia do tipo de quarto single numa lista de divisões
 def singleCheck(array_divisoes):
-	
 	for divisao in array_divisoes:
 		if divisao.tipo == 'single':
 			return True
 	return False
 
-# Sem distancias
+# Retorna uma lista de arestas sem peso (suporte para o grafo)
 def getEdges(array_divisoes):
 	
 	edges = []
@@ -47,17 +49,17 @@ def getEdges(array_divisoes):
 			edges.append([divisao.id, vizinho])
 	return edges 
 
-# Com distancias e desenhar o grafo a partir da posição atual
-def getEdges_weight(array_divisoes, grafo, src, coord):
-
+# Retorna um grafo cujas arestas são formadas consoante a divisão e coordenadas atuais
+def getEdges_weight(array_divisoes, grafo, start, coord):
+	
 	for divisao in array_divisoes:
 		l_vizinhos = divisao.viz
 		for id_vizinho in l_vizinhos:
 			vizinho = getDivisao(id_vizinho, array_divisoes)
 
-			if divisao.id == src:
+			if divisao.id == start:
 				dist = twopoint_distance(coord, vizinho.pm)
-			elif id_vizinho == src:
+			elif id_vizinho == start:
 				dist = twopoint_distance(divisao.pm, coord)
 			else:
 				dist = twopoint_distance(divisao.pm, vizinho.pm)
@@ -66,7 +68,7 @@ def getEdges_weight(array_divisoes, grafo, src, coord):
 			grafo.add_edges_from([(divisao.id, vizinho.id)], dist=dist)
 	return grafo
 
-
+# Retorna um caminho de um nodo até outro nodo (pesquisa em largura)
 def pesquisa(grafo, src, dest, path):
 	
 	if src is dest:
@@ -81,23 +83,58 @@ def pesquisa(grafo, src, dest, path):
                 path.append(dest)
                 return pesquisa(grafo, src, ponto1, path)
 
+
+def bookP(nome):
+	full = nome.split("_", 1)
+	return (full[0], full[1])
+
+def parsebook(nome, book_list, time):
+	
+	rm_shadytrail = nome.rstrip(',')
+	
+	if ',' in rm_shadytrail:
+			
+		elem = rm_shadytrail.split(",")
+		for sing_nome in elem:
+			(tipo, designacao) = bookP(sing_nome)
+			if tipo == 'book':
+				book_list.append((designacao, time))
+				return True
+
+	else:
+		(tipo, designacao) = bookP(rm_shadytrail)
+		if tipo == 'book':
+			book_list.append((designacao, time))
+			return True
+
+	return False
+	
+# Fazer parse de doubles
+def fst(tuple):
+	return tuple[0]
+
+def snd(tuple):
+	return tuple[1]
+
+
+# Retorna uma string identificadora e um ponto médio consoante uma posição num plano bi-dimensional
 def present_room(x, y):
 
 	# Paredes Verticais +-0.6
 	# Paredes Horizontais +-0.5
-	# Adicionar +- 0.1 consoante a orientação da parede para remover edge situations
+	# Adicionar +- 0.1 consoante a orientação da parede para remover alguns erros
 
 	if(y < -1.3):
 		pm = (-6, -2.15)
 		return (pm, "corredor1")
 	
-	if((x > -11.9) and (5.3 <= y <= 7.4)):
-		pm = (-4.1, 6.35)
-		return (pm, "corredor3")
-
 	if((-11.9 <= x <= -9.4) and (-1.3 <= y <= 5.4)):
 		pm = (-10.7, 2.05)
 		return (pm, "corredor2")
+
+	if((x > -11.9) and (5.3 <= y <= 7.4)):
+		pm = (-4.1, 6.35)
+		return (pm, "corredor3")
 
 	if((-4.0 <= x <= -1.4) and (-1.3 <= y <= 5.4)):
 		pm = (-2.7, 2.05)
@@ -144,3 +181,4 @@ def present_room(x, y):
 		return (pm, "sala14")
 	
 	return ((0, 0), "porta")
+
