@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # encoding: utf8
 
+# André Silva a39474
+# David Bugalho a40284 
+
 # Parse de doubles
 
 def name_parse(nome):

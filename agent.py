@@ -3,6 +3,9 @@
 # Artificial Intelligence, UBI 2019-20
 # Modified by: Students names and numbers
 
+# André Silva a39474
+# David Bugalho a40284 
+
 import rospy
 from std_msgs.msg import String
 from nav_msgs.msg import Odometry
@@ -75,9 +78,9 @@ def searchPeople(array_divisoes):
 			pessoasQuartos += divisao.getNumPessoas()
 
 	if pessoasCorredores > pessoasQuartos:
-		print "More people in hallways compared to room."
+		print "Higher chance of finding people in hallways compared to rooms."
 	elif pessoasCorredores < pessoasQuartos:
-		print "More people in the rooms compared to hallways."
+		print "Higher chance of finding people in rooms compared to hallways."
 	else:
 		print "There are exactly the same number of people inside and outside of rooms (%d)." %pessoasQuartos
 

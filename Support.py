@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # encoding: utf8
 
+# André Silva a39474
+# David Bugalho a40284 
+
 import Divisao
 import networkx as nx
 from math import sqrt
